@@ -1,31 +1,19 @@
-resource "azurerm_kubernetes_cluster" "k8s" {
-  location            = var.location
-  name                = var.cluster_name
-  resource_group_name = var.resource_group_name
-  dns_prefix = "test"
-  
-  identity {
-    type = "SystemAssigned"
-  }
+module "aks_arc" { 
+# Make sure to use the latest AVM module version
+source = "Azure/avm-res-hybridcontainerservice-provisionedclusterinstance/azurerm" 
+version = "~>2.0"
 
-  default_node_pool {
-    name       = var.agent_name
-    vm_size    = var.agent_VMsize
-    node_count = var.agent_count
-    os_disk_type = var.agent_OStype
-    node_labels = var.nodepoolLabel
-    
-  }
-  linux_profile {
-    admin_username = var.username
+# Make sure to provide all required parameters  
+resource_group_id = "<Resource_Group>"
+location = "<Location>" 
+name = "<name>" 
+logical_network_id = "<LNet_ID>" 
+custom_location_id = "<CustomLocation_ID>" 
+agent_pool_profiles = [{count=1}] 
+ssh_public_key =  "Your_SSH_Key"
 
-    ssh_key {
-      key_data = var.ssh_key
-    }
-  }
-  network_profile {
-    network_plugin    = "kubenet"
-    load_balancer_sku = "standard"
-  }
-  
+# Optional parameters, update them as needed
+enable_azure_rbac = false
+enable_workload_identity = false 
+enable_oidc_issuer = false
 }
